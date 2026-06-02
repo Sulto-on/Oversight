@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>OVERSIGHT</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0a0a;color:#f0ede6;font-family:'Helvetica Neue',Arial,sans-serif;overflow-x:hidden}
+a{text-decoration:none;color:inherit}
+
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:1.1rem 3rem;background:rgba(10,10,10,.95);backdrop-filter:blur(12px);border-bottom:1px solid rgba(240,237,230,.1)}
+.logo{font-size:1.3rem;font-weight:900;letter-spacing:.4em}
+.nav-links{display:flex;gap:2.5rem}
+.nav-links a{font-size:.65rem;letter-spacing:.22em;text-transform:uppercase;color:#888;transition:color .2s}
+.nav-links a:hover{color:#f0ede6}
+.cart-btn{display:flex;align-items:center;gap:.5rem;font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;cursor:pointer;background:none;border:1px solid rgba(240,237,230,.2);color:#f0ede6;padding:.45rem 1rem;transition:border-color .2s}
+.cart-btn:hover{border-color:#f0ede6}
+.cart-count{background:#f0ede6;color:#0a0a0a;font-size:.58rem;width:17px;height:17px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900}
+
+.hero{height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;position:relative;overflow:hidden;background:#0a0a0a}
+.hero-canvas{position:absolute;inset:0;width:100%;height:100%}
+.hero-content{position:relative;z-index:2}
+.hero-eyebrow{font-size:.6rem;letter-spacing:.5em;text-transform:uppercase;color:#888;margin-bottom:1.5rem}
+.hero-title{font-size:clamp(5rem,13vw,10rem);font-weight:900;letter-spacing:.05em;line-height:.85;text-transform:uppercase;margin-bottom:2rem}
+.hero-sub{font-size:.75rem;letter-spacing:.3em;text-transform:uppercase;color:#888;margin-bottom:3rem}
+.hero-btns{display:flex;gap:1rem;justify-content:center}
+.btn-w{background:#f0ede6;color:#0a0a0a;font-size:.65rem;letter-spacing:.22em;text-transform:uppercase;padding:.85rem 2.2rem;border:none;cursor:pointer;font-weight:700;transition:opacity .2s}
+.btn-w:hover{opacity:.85}
+.btn-o{background:transparent;color:#f0ede6;font-size:.65rem;letter-spacing:.22em;text-transform:uppercase;padding:.85rem 2.2rem;border:1px solid rgba(240,237,230,.25);cursor:pointer;transition:border-color .2s}
+.btn-o:hover{border-color:#f0ede6}
+
+.ticker{border-top:1px solid rgba(240,237,230,.1);border-bottom:1px solid rgba(240,237,230,.1);background:#f0ede6;padding:.6rem 0;overflow:hidden}
+.ticker-track{display:flex;white-space:nowrap;animation:tick 22s linear infinite}
+.ticker-track span{font-size:.6rem;letter-spacing:.28em;text-transform:uppercase;color:#0a0a0a;padding:0 2.5rem;font-weight:700}
+@keyframes tick{to{transform:translateX(-50%)}}
+
+/* COLLECTIONS */
+.section{padding:6rem 3rem}
+.sec-header{text-align:center;margin-bottom:4rem}
+.sec-eye{font-size:.6rem;letter-spacing:.45em;text-transform:uppercase;color:#888;margin-bottom:.7rem}
+.sec-title{font-size:clamp(2rem,5vw,4rem);font-weight:900;letter-spacing:.05em;text-transform:uppercase}
+.sec-sub{font-size:.75rem;color:#666;letter-spacing:.1em;margin-top:.8rem}
+
+/* YIN COLLECTION — dark bg */
+.yin-section{background:#0a0a0a;border-top:1px solid rgba(240,237,230,.08)}
+.yin-section .sec-title{color:#f0ede6}
+.yang-section{background:#f0ede6;border-top:1px solid rgba(10,10,10,.1)}
+.yang-section .sec-title,.yang-section .sec-eye,.yang-section .sec-sub,.yang-section .item-name,.yang-section .item-price{color:#0a0a0a}
+.yang-section .sec-eye,.yang-section .sec-sub{color:#888}
+.yang-section .item-price{color:#666}
+
+.clothes-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem;max-width:1200px;margin:0 auto}
+.cloth-card{cursor:pointer;position:relative}
+.cloth-img{width:100%;aspect-ratio:3/4;position:relative;overflow:hidden}
+.cloth-img canvas{width:100%;height:100%;display:block;transition:transform .6s ease}
+.cloth-card:hover .cloth-img canvas{transform:scale(1.03)}
+.cloth-badge{position:absolute;top:.8rem;left:.8rem;font-size:.52rem;letter-spacing:.18em;text-transform:uppercase;padding:.3rem .75rem;font-weight:700;z-index:2}
+.badge-w{background:#f0ede6;color:#0a0a0a}
+.badge-b{background:#0a0a0a;color:#f0ede6}
+.cloth-info{padding:.9rem 0 .4rem;display:flex;justify-content:space-between;align-items:center}
+.item-name{font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600;color:#f0ede6}
+.item-price{font-size:.68rem;color:#888;letter-spacing:.06em}
+.quick-add{position:absolute;bottom:52px;left:0;right:0;background:rgba(10,10,10,.9);color:#f0ede6;font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;padding:.8rem;text-align:center;opacity:0;transition:opacity .25s;cursor:pointer;border-top:1px solid rgba(240,237,230,.1)}
+.yang-section .quick-add{background:rgba(240,237,230,.92);color:#0a0a0a;border-top:1px solid rgba(10,10,10,.1)}
+.cloth-card:hover .quick-add{opacity:1}
+
+/* SYMBOL BANNER */
+.sym-banner{background:#0a0a0a;padding:5rem 3rem;display:flex;align-items:center;justify-content:center;gap:5rem;border-top:1px solid rgba(240,237,230,.08)}
+.sym-text{max-width:320px}
+.sym-eyebrow{font-size:.6rem;letter-spacing:.4em;text-transform:uppercase;color:#888;margin-bottom:1rem}
+.sym-title{font-size:2.5rem;font-weight:900;text-transform:uppercase;letter-spacing:.04em;line-height:1;margin-bottom:1.2rem}
+.sym-body{font-size:.78rem;line-height:1.9;color:#666}
+
+/* FOOTER */
+footer{background:#f0ede6;color:#0a0a0a;padding:4rem 3rem 0;display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr;gap:3rem}
+.f-logo{font-size:1.1rem;font-weight:900;letter-spacing:.4em;display:block;margin-bottom:.8rem}
+.f-brand p{font-size:.72rem;color:#666;line-height:1.85;max-width:200px}
+.f-col h4{font-size:.57rem;letter-spacing:.3em;text-transform:uppercase;color:#aaa;margin-bottom:1.1rem}
+.f-col a{display:block;font-size:.72rem;color:#555;margin-bottom:.6rem;transition:color .2s}
+.f-col a:hover{color:#0a0a0a}
+.f-btm{background:#0a0a0a;color:#f0ede6;padding:1.2rem 3rem;display:flex;justify-content:space-between;margin-top:3rem}
+.f-btm p{font-size:.6rem;color:#555;letter-spacing:.1em}
+
+/* CART PANEL */
+.cart-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;opacity:0;pointer-events:none;transition:opacity .3s}
+.cart-overlay.open{opacity:1;pointer-events:all}
+.cart-panel{position:fixed;top:0;right:-430px;width:400px;height:100vh;background:#f0ede6;color:#0a0a0a;z-index:201;transition:right .35s ease;display:flex;flex-direction:column;padding:2rem}
+.cart-panel.open{right:0}
+.cart-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;border-bottom:1px solid rgba(0,0,0,.1);padding-bottom:1rem}
+.cart-hdr h2{font-size:.7rem;letter-spacing:.3em;text-transform:uppercase;font-weight:700}
+.cls-btn{background:none;border:none;color:#0a0a0a;font-size:1.2rem;cursor:pointer}
+.cart-items{flex:1;overflow-y:auto}
+.c-item{display:flex;gap:1rem;padding:.9rem 0;border-bottom:1px solid rgba(0,0,0,.07)}
+.c-thumb{width:60px;height:74px;background:#e0ddd6;flex-shrink:0;overflow:hidden}
+.c-thumb canvas{width:100%;height:100%;display:block}
+.c-name{font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600;margin-bottom:.3rem}
+.c-price{font-size:.65rem;color:#777}
+.c-rm{background:none;border:none;color:#aaa;cursor:pointer;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;margin-top:.4rem;transition:color .2s}
+.c-rm:hover{color:#0a0a0a}
+.cart-ftr{padding-top:1.3rem;border-top:1px solid rgba(0,0,0,.1)}
+.cart-tot{display:flex;justify-content:space-between;margin-bottom:1.3rem;font-size:.7rem;letter-spacing:.15em;text-transform:uppercase}
+.cart-tot strong{font-size:.95rem;font-weight:900}
+.empty-c{color:#aaa;font-size:.75rem;text-align:center;margin-top:4rem;letter-spacing:.05em}
+.btn-checkout{background:#0a0a0a;color:#f0ede6;font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;padding:1rem;border:none;cursor:pointer;width:100%;font-weight:700}
+</style>
+</head>
+<body>
+
+<nav>
+  <span class="logo">OVERSIGHT</span>
+  <div class="nav-links">
+    <a href="#">New Drop</a><a href="#">Yin Collection</a><a href="#">Yang Collection</a><a href="#">Lookbook</a>
+  </div>
+  <button class="cart-btn" onclick="toggleCart()">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+    Cart <span class="cart-count" id="cc">0</span>
+  </button>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <canvas class="hero-canvas" id="hero-canvas"></canvas>
+  <div class="hero-content">
+    <p class="hero-eyebrow">SS 2025 — Yin & Yang Collection</p>
+    <h1 class="hero-title">OVER<br>SIGHT</h1>
+    <p class="hero-sub">Two forces. One brand. Wear the balance.</p>
+    <div class="hero-btns">
+      <button class="btn-w" onclick="document.getElementById('yin').scrollIntoView({behavior:'smooth'})">Shop Collection</button>
+      <button class="btn-o">View Lookbook</button>
+    </div>
+  </div>
+</section>
+
+<div class="ticker">
+  <div class="ticker-track">
+    <span>☯ New Drop SS25</span><span>☯ Yin Collection</span><span>☯ Yang Collection</span><span>☯ Free Shipping ₦50k+</span><span>☯ Limited Drops</span><span>☯ Lagos Born</span>
+    <span>☯ New Drop SS25</span><span>☯ Yin Collection</span><span>☯ Yang Collection</span><span>☯ Free Shipping ₦50k+</span><span>☯ Limited Drops</span><span>☯ Lagos Born</span>
+  </div>
+</div>
+
+<!-- YIN COLLECTION -->
+<section class="yin-section section" id="yin">
+  <div class="sec-header">
+    <p class="sec-eye">☯ Dark Force</p>
+    <h2 class="sec-title">Yin Collection</h2>
+    <p class="sec-sub" style="color:#666">Shadow tones. Midnight weight. Worn after dark.</p>
+  </div>
+  <div class="clothes-grid" id="yin-grid"></div>
+</section>
+
+<!-- SYMBOL SECTION -->
+<div class="sym-banner">
+  <div class="sym-text">
+    <p class="sym-eyebrow">The Philosophy</p>
+    <h3 class="sym-title">Dark &amp;<br>Light</h3>
+    <p class="sym-body">Every Oversight piece carries both forces — the shadow detail in the white, the light thread in the black. You don't choose a side. You wear both.</p>
+  </div>
+  <canvas id="sym-canvas" width="280" height="280" style="flex-shrink:0"></canvas>
+  <div class="sym-text" style="text-align:right">
+    <p class="sym-eyebrow" style="text-align:right">The Duality</p>
+    <h3 class="sym-title">Night &amp;<br>Day</h3>
+    <p class="sym-body" style="text-align:right">One label. Two collections. Infinite combinations. The yin piece needs the yang. The yang needs the dark.</p>
+  </div>
+</div>
+
+<!-- YANG COLLECTION -->
+<section class="yang-section section" id="yang">
+  <div class="sec-header">
+    <p class="sec-eye" style="color:#888">☯ Light Force</p>
+    <h2 class="sec-title">Yang Collection</h2>
+    <p class="sec-sub">Ivory tones. Sharp cuts. Seen from a mile away.</p>
+  </div>
+  <div class="clothes-grid" id="yang-grid"></div>
+</section>
+
+<footer>
+  <div class="f-brand">
+    <span class="f-logo">OVERSIGHT</span>
+    <p>Two forces. One label. Designed in Lagos, worn everywhere darkness meets light.</p>
+  </div>
+  <div class="f-col"><h4>Shop</h4><a href="#">New Arrivals</a><a href="#">Yin Collection</a><a href="#">Yang Collection</a><a href="#">Accessories</a></div>
+  <div class="f-col"><h4>Brand</h4><a href="#">About</a><a href="#">Lookbook</a><a href="#">Sizing</a><a href="#">Stockists</a></div>
+  <div class="f-col"><h4>Support</h4><a href="#">Contact</a><a href="#">Shipping</a><a href="#">Returns</a><a href="#">Instagram</a></div>
+</footer>
+<div class="f-btm"><p>© 2025 Oversight. All rights reserved.</p><p>Lagos, Nigeria</p></div>
+
+<!-- CART -->
+<div class="cart-overlay" id="cart-overlay" onclick="toggleCart()"></div>
+<div class="cart-panel" id="cart-panel">
+  <div class="cart-hdr">
+    <h2>Cart (<span id="chc">0</span>)</h2>
+    <button class="cls-btn" onclick="toggleCart()">✕</button>
+  </div>
+  <div class="cart-items" id="cart-items"><p class="empty-c">Your cart is empty.</p></div>
+  <div class="cart-ftr" id="cart-ftr" style="display:none">
+    <div class="cart-tot"><span>Total</span><strong id="cart-tot">₦0</strong></div>
+    <button class="btn-checkout">Checkout</button>
+  </div>
+</div>
+
+<script>
+/* ── DATA ── */
+const yinItems=[
+  {name:'Shadow Hoodie',price:42000,type:'hoodie',badge:'New'},
+  {name:'Void Bomber',price:64000,type:'jacket',badge:'Limited'},
+  {name:'Dark Force Tee',price:19000,type:'tee',badge:''},
+  {name:'Eclipse Cargo',price:48000,type:'cargo',badge:'Drop'},
+];
+const yangItems=[
+  {name:'Ivory Crewneck',price:38000,type:'crewneck',badge:'New'},
+  {name:'Polar Coach',price:64000,type:'coach',badge:'Limited'},
+  {name:'Light Force Tee',price:19000,type:'tee',badge:''},
+  {name:'Crystal Wide Leg',price:48000,type:'widelegs',badge:'Drop'},
+];
+
+/* ── CANVAS CLOTHING RENDERER ── */
+function drawGarment(canvas,type,dark,mini=false){
+  const W=canvas.width,H=canvas.height;
+  const ctx=canvas.getContext('2d');
+  const bg=dark?'#0e0e0e':'#eeebe4';
+  const fg=dark?'#e8e4dd':'#111111';
+  const mid=dark?'rgba(232,228,221,.06)':'rgba(17,17,17,.06)';
+  const seam=dark?'rgba(232,228,221,.12)':'rgba(17,17,17,.12)';
+  ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+
+  /* subtle grid texture */
+  ctx.strokeStyle=mid;ctx.lineWidth=.5;
+  for(let x=0;x<W;x+=20){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke()}
+  for(let y=0;y<H;y+=20){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke()}
+
+  const sc=mini?.5:1;
+  const cx=W/2,cy=H/2;
+  ctx.save();ctx.translate(cx,cy);ctx.scale(sc,sc);
+  ctx.fillStyle=fg;ctx.strokeStyle=seam;ctx.lineWidth=1;
+
+  /* FABRIC TEXTURE — crosshatch overlay */
+  const tmp=document.createElement('canvas');tmp.width=W;tmp.height=H;
+  const tc=tmp.getContext('2d');
+  tc.strokeStyle=dark?'rgba(255,255,255,.018)':'rgba(0,0,0,.02)';
+  tc.lineWidth=.4;
+  for(let i=-H;i<W+H;i+=8){tc.beginPath();tc.moveTo(i,0);tc.lineTo(i+H,H);tc.stroke()}
+  for(let i=-H;i<W+H;i+=8){tc.beginPath();tc.moveTo(i+H,0);tc.lineTo(i,H);tc.stroke()}
+
+  const hw=W*.32,hh=H*.4;/* half-width, half-height of garment body */
+
+  if(type==='hoodie'||type==='crewneck'){
+    /* torso */
+    ctx.beginPath();
+    ctx.moveTo(-hw,H*.08);ctx.lineTo(-hw*.35,H*.08);ctx.lineTo(-hw*.3,hh);
+    ctx.lineTo(hw*.3,hh);ctx.lineTo(hw*.35,H*.08);ctx.lineTo(hw,H*.08);
+    ctx.lineTo(hw*.6,-hh*.85);ctx.lineTo(hw*.2,-hh);
+    ctx.lineTo(-hw*.2,-hh);ctx.lineTo(-hw*.6,-hh*.85);ctx.closePath();ctx.fill();
+    /* sleeves */
+    ctx.beginPath();ctx.moveTo(-hw*.35,H*.06);ctx.lineTo(-hw,H*.08);ctx.lineTo(-hw*.75,H*.22);ctx.lineTo(-hw*.55,H*.24);ctx.lineTo(-hw*.28,H*.1);ctx.closePath();ctx.fill();
+    ctx.beginPath();ctx.moveTo(hw*.35,H*.06);ctx.lineTo(hw,H*.08);ctx.lineTo(hw*.75,H*.22);ctx.lineTo(hw*.55,H*.24);ctx.lineTo(hw*.28,H*.1);ctx.closePath();ctx.fill();
+    /* ribbing bottom */
+    ctx.strokeStyle=seam;ctx.lineWidth=1.5;
+    for(let y=hh-12;y<hh+2;y+=4){ctx.beginPath();ctx.moveTo(-hw*.3+4,y);ctx.lineTo(hw*.3-4,y);ctx.stroke()}
+    /* collar */
+    if(type==='hoodie'){
+      ctx.fillStyle=fg;
+      ctx.beginPath();ctx.ellipse(0,-hh*.78,hw*.22,hw*.16,0,0,Math.PI*2);ctx.fill();
+      ctx.fillStyle=bg;
+      ctx.beginPath();ctx.ellipse(0,-hh*.78,hw*.15,hw*.1,0,0,Math.PI*2);ctx.fill();
+      /* hood peak */
+      ctx.fillStyle=fg;
+      ctx.beginPath();ctx.moveTo(-hw*.22,-hh*.78);ctx.quadraticCurveTo(-hw*.3,-hh*1.1,0,-hh*1.18);ctx.quadraticCurveTo(hw*.3,-hh*1.1,hw*.22,-hh*.78);ctx.closePath();ctx.fill();
+      ctx.fillStyle=bg;ctx.beginPath();ctx.ellipse(0,-hh*.99,hw*.12,hw*.09,0,0,Math.PI*2);ctx.fill();
+    } else {
+      ctx.fillStyle=fg;ctx.beginPath();ctx.ellipse(0,-hh*.82,hw*.2,hw*.1,0,0,Math.PI*2);ctx.fill();
+      ctx.fillStyle=bg;ctx.beginPath();ctx.ellipse(0,-hh*.82,hw*.12,hw*.06,0,0,Math.PI*2);ctx.fill();
+    }
+    /* pouch pocket */
+    ctx.fillStyle=seam;ctx.fillRect(-hw*.2,hh*.2,hw*.4,hh*.28);
+    ctx.strokeStyle=seam;ctx.lineWidth=.8;ctx.strokeRect(-hw*.2,hh*.2,hw*.4,hh*.28);
+  }
+  else if(type==='jacket'||type==='coach'){
+    /* body */
+    ctx.beginPath();
+    ctx.moveTo(-hw,H*.06);ctx.lineTo(-hw*.28,-hh);ctx.lineTo(hw*.28,-hh);ctx.lineTo(hw,H*.06);
+    ctx.lineTo(hw*.3,hh);ctx.lineTo(-hw*.3,hh);ctx.closePath();ctx.fill();
+    /* sleeves */
+    ctx.beginPath();ctx.moveTo(-hw,H*.06);ctx.lineTo(-hw*.9,H*.25);ctx.lineTo(-hw*.7,H*.27);ctx.lineTo(-hw*.28,H*.04);ctx.closePath();ctx.fill();
+    ctx.beginPath();ctx.moveTo(hw,H*.06);ctx.lineTo(hw*.9,H*.25);ctx.lineTo(hw*.7,H*.27);ctx.lineTo(hw*.28,H*.04);ctx.closePath();ctx.fill();
+    /* lapels */
+    ctx.fillStyle=bg;
+    ctx.beginPath();ctx.moveTo(0,-hh*.5);ctx.lineTo(-hw*.18,-hh*.9);ctx.lineTo(-hw*.1,-hh*.1);ctx.closePath();ctx.fill();
+    ctx.beginPath();ctx.moveTo(0,-hh*.5);ctx.lineTo(hw*.18,-hh*.9);ctx.lineTo(hw*.1,-hh*.1);ctx.closePath();ctx.fill();
+    /* center seam */
+    ctx.strokeStyle=seam;ctx.lineWidth=1;ctx.setLineDash([3,3]);
+    ctx.beginPath();ctx.moveTo(0,-hh*.5);ctx.lineTo(0,hh);ctx.stroke();ctx.setLineDash([]);
+    /* pockets */
+    ctx.strokeStyle=seam;ctx.lineWidth=1;
+    ctx.strokeRect(-hw*.22,hh*.05,hw*.18,hh*.2);
+    ctx.strokeRect(hw*.04,hh*.05,hw*.18,hh*.2);
+    if(type==='coach'){/* windbreaker cuffs */
+      for(let i=0;i<3;i++){ctx.beginPath();ctx.moveTo(-hw*.7,H*.26+i*3.5);ctx.lineTo(-hw*.88,H*.24+i*3.5);ctx.stroke()}
+      for(let i=0;i<3;i++){ctx.beginPath();ctx.moveTo(hw*.7,H*.26+i*3.5);ctx.lineTo(hw*.88,H*.24+i*3.5);ctx.stroke()}
+    }
+  }
+  else if(type==='tee'){
+    ctx.beginPath();
+    ctx.moveTo(-hw*.9,H*.06);ctx.lineTo(-hw*.24,-hh*.9);ctx.lineTo(hw*.24,-hh*.9);ctx.lineTo(hw*.9,H*.06);
+    ctx.lineTo(hw*.35,H*.08);ctx.lineTo(hw*.28,hh);ctx.lineTo(-hw*.28,hh);ctx.lineTo(-hw*.35,H*.08);ctx.closePath();ctx.fill();
+    ctx.fillStyle=bg;ctx.beginPath();ctx.ellipse(0,-hh*.7,hw*.18,hw*.1,0,0,Math.PI*2);ctx.fill();
+  }
+  else if(type==='cargo'){
+    /* waistband */
+    ctx.fillStyle=fg;ctx.fillRect(-hw*.32,-hh*.92,hw*.64,hh*.12);
+    /* left leg */
+    ctx.beginPath();ctx.moveTo(-hw*.32,-hh*.8);ctx.lineTo(-hw*.32,hh*.3);ctx.bezierCurveTo(-hw*.32,hh*.8,-hw*.06,hh,0,hh);ctx.lineTo(0,-hh*.25);ctx.closePath();ctx.fill();
+    /* right leg */
+    ctx.beginPath();ctx.moveTo(hw*.32,-hh*.8);ctx.lineTo(hw*.32,hh*.3);ctx.bezierCurveTo(hw*.32,hh*.8,hw*.06,hh,0,hh);ctx.lineTo(0,-hh*.25);ctx.closePath();ctx.fill();
+    /* cargo pockets */
+    ctx.strokeStyle=seam;ctx.lineWidth=1.2;
+    ctx.strokeRect(-hw*.3,-hh*.3,hw*.22,hh*.22);
+    ctx.strokeRect(hw*.08,-hh*.3,hw*.22,hh*.22);
+    ctx.beginPath();ctx.moveTo(-hw*.19,-hh*.08);ctx.lineTo(-hw*.19,-hh*.3);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(hw*.19,-hh*.08);ctx.lineTo(hw*.19,-hh*.3);ctx.stroke();
+  }
+  else if(type==='widelegs'){
+    ctx.beginPath();ctx.moveTo(-hw*.38,-hh*.92);ctx.lineTo(-hw*.38,hh*.5);ctx.bezierCurveTo(-hw*.38,hh*.95,-hw*.55,hh,-hw*.5,hh);ctx.lineTo(0,hh*.1);ctx.lineTo(0,-hh*.25);ctx.closePath();ctx.fill();
+    ctx.beginPath();ctx.moveTo(hw*.38,-hh*.92);ctx.lineTo(hw*.38,hh*.5);ctx.bezierCurveTo(hw*.38,hh*.95,hw*.55,hh,hw*.5,hh);ctx.lineTo(0,hh*.1);ctx.lineTo(0,-hh*.25);ctx.closePath();ctx.fill();
+    ctx.fillStyle=fg;ctx.fillRect(-hw*.38,-hh*1.02,hw*.76,hh*.14);
+    ctx.strokeStyle=seam;ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(-hw*.38,-hh*.4);ctx.lineTo(0,-hh*.35);ctx.lineTo(hw*.38,-hh*.4);ctx.stroke();
+  }
+
+  /* OVERSIGHT chest logo */
+  ctx.restore();
+  const logoY=type==='cargo'||type==='widelegs'?cy-hh*.6*sc+40:cy-12;
+  ctx.save();
+  ctx.translate(cx,logoY+10);
+  ctx.fillStyle=dark?'rgba(232,228,221,.7)':'rgba(17,17,17,.7)';
+  ctx.font=`900 ${mini?7:10}px 'Helvetica Neue',Arial,sans-serif`;
+  ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.letterSpacing='3px';
+  ctx.fillText('OVERSIGHT',0,0);
+  /* mini yin-yang */
+  const r=mini?5:8,yy=mini?9:14;
+  drawYY(ctx,0,yy,r,dark?'#e8e4dd':'#111',dark?'#111':'#e8e4dd');
+  ctx.restore();
+
+  /* fabric overlay */
+  ctx.drawImage(tmp,0,0);
+}
+
+function drawYY(ctx,x,y,r,c1,c2){
+  ctx.save();ctx.translate(x,y);
+  ctx.beginPath();ctx.arc(0,0,r,0,Math.PI*2);ctx.fillStyle=c1;ctx.fill();
+  ctx.beginPath();ctx.arc(0,0,r,Math.PI,0,false);ctx.fillStyle=c2;ctx.fill();
+  ctx.beginPath();ctx.arc(0,-r/2,r/2,0,Math.PI*2);ctx.fillStyle=c2;ctx.fill();
+  ctx.beginPath();ctx.arc(0,r/2,r/2,0,Math.PI*2);ctx.fillStyle=c1;ctx.fill();
+  ctx.beginPath();ctx.arc(0,-r/2,r*.22,0,Math.PI*2);ctx.fillStyle=c1;ctx.fill();
+  ctx.beginPath();ctx.arc(0,r/2,r*.22,0,Math.PI*2);ctx.fillStyle=c2;ctx.fill();
+  ctx.restore();
+}
+
+/* ── HERO CANVAS — animated yin-yang ── */
+function initHero(){
+  const canvas=document.getElementById('hero-canvas');
+  const ctx=canvas.getContext('2d');
+  let W,H,t=0;
+  function resize(){W=canvas.width=canvas.offsetWidth;H=canvas.height=canvas.offsetHeight}
+  resize();window.addEventListener('resize',resize);
+
+  function frame(){
+    ctx.fillStyle='#0a0a0a';ctx.fillRect(0,0,W,H);
+    t+=.003;
+    const cx=W/2,cy=H/2;
+    /* outer ring glow lines */
+    for(let i=0;i<6;i++){
+      const a=t+i*Math.PI/3,r=Math.min(W,H)*.35+Math.sin(t*2+i)*.012*Math.min(W,H);
+      ctx.save();ctx.translate(cx,cy);ctx.rotate(a);
+      ctx.strokeStyle=`rgba(240,237,230,${.025+.015*Math.sin(t*3+i)})`;
+      ctx.lineWidth=.5;ctx.beginPath();ctx.arc(0,0,r,0,Math.PI*2);ctx.stroke();
+      ctx.restore();
+    }
+    /* large yin-yang rotating */
+    const R=Math.min(W,H)*.28;
+    ctx.save();ctx.translate(cx,cy);ctx.rotate(t*.6);
+    /* outer ring */
+    ctx.strokeStyle='rgba(240,237,230,.08)';ctx.lineWidth=1;
+    ctx.beginPath();ctx.arc(0,0,R+8,0,Math.PI*2);ctx.stroke();
+    /* yin half */
+    ctx.beginPath();ctx.arc(0,0,R,Math.PI,0,false);ctx.fillStyle='rgba(240,237,230,.9)';ctx.fill();
+    /* yang half */
+    ctx.beginPath();ctx.arc(0,0,R,0,Math.PI,false);ctx.fillStyle='rgba(20,20,20,.92)';ctx.fill();
+    ctx.strokeStyle='rgba(240,237,230,.15)';ctx.lineWidth=.5;ctx.beginPath();ctx.arc(0,0,R,0,Math.PI*2);ctx.stroke();
+    /* upper circle — white in dark half */
+    ctx.beginPath();ctx.arc(0,-R/2,R/2,0,Math.PI*2);ctx.fillStyle='rgba(240,237,230,.9)';ctx.fill();
+    /* lower circle — dark in white half */
+    ctx.beginPath();ctx.arc(0,R/2,R/2,0,Math.PI*2);ctx.fillStyle='rgba(20,20,20,.92)';ctx.fill();
+    /* inner dots */
+    ctx.beginPath();ctx.arc(0,-R/2,R*.12,0,Math.PI*2);ctx.fillStyle='rgba(20,20,20,.85)';ctx.fill();
+    ctx.beginPath();ctx.arc(0,R/2,R*.12,0,Math.PI*2);ctx.fillStyle='rgba(240,237,230,.85)';ctx.fill();
+    ctx.restore();
+
+    /* particle ring */
+    for(let i=0;i<36;i++){
+      const a=t*.4+i*Math.PI*2/36,r=Math.min(W,H)*.38+Math.sin(t*2+i*.5)*6;
+      const px=cx+Math.cos(a)*r,py=cy+Math.sin(a)*r;
+      const side=Math.sin(a)>0;
+      ctx.beginPath();ctx.arc(px,py,1.5+Math.sin(t*4+i)*.5,0,Math.PI*2);
+      ctx.fillStyle=side?'rgba(240,237,230,.5)':'rgba(240,237,230,.25)';ctx.fill();
+    }
+    requestAnimationFrame(frame);
+  }
+  frame();
+}
+
+/* ── SYMBOL SECTION CANVAS ── */
+function initSym(){
+  const canvas=document.getElementById('sym-canvas');
+  const ctx=canvas.getContext('2d');
+  const W=280,H=280,cx=140,cy=140;
+  let t=0;
+  function frame(){
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle='#0a0a0a';ctx.fillRect(0,0,W,H);
+    t+=.008;
+    const R=100;
+    ctx.save();ctx.translate(cx,cy);ctx.rotate(-t*.5);
+    /* outer dashed rings */
+    for(let k=0;k<3;k++){
+      ctx.setLineDash([4,6]);ctx.strokeStyle=`rgba(240,237,230,${.08+k*.04})`;ctx.lineWidth=.8;
+      ctx.beginPath();ctx.arc(0,0,R+12+k*12,0,Math.PI*2);ctx.stroke();
+    }
+    ctx.setLineDash([]);
+    /* main symbol */
+    ctx.beginPath();ctx.arc(0,0,R,Math.PI,0,false);ctx.fillStyle='#f0ede6';ctx.fill();
+    ctx.beginPath();ctx.arc(0,0,R,0,Math.PI,false);ctx.fillStyle='#111';ctx.fill();
+    ctx.strokeStyle='rgba(240,237,230,.2)';ctx.lineWidth=1;ctx.beginPath();ctx.arc(0,0,R,0,Math.PI*2);ctx.stroke();
+    ctx.beginPath();ctx.arc(0,-R/2,R/2,0,Math.PI*2);ctx.fillStyle='#f0ede6';ctx.fill();
+    ctx.beginPath();ctx.arc(0,R/2,R/2,0,Math.PI*2);ctx.fillStyle='#111';ctx.fill();
+    ctx.beginPath();ctx.arc(0,-R/2,R*.13,0,Math.PI*2);ctx.fillStyle='#111';ctx.fill();
+    ctx.beginPath();ctx.arc(0,R/2,R*.13,0,Math.PI*2);ctx.fillStyle='#f0ede6';ctx.fill();
+    ctx.restore();
+
+    /* orbit dots */
+    for(let i=0;i<12;i++){
+      const a=t+i*Math.PI/6,r=128;
+      ctx.beginPath();ctx.arc(cx+Math.cos(a)*r,cy+Math.sin(a)*r,2,0,Math.PI*2);
+      ctx.fillStyle=`rgba(240,237,230,${.3+.2*Math.sin(t*2+i)})`;ctx.fill();
+    }
+    requestAnimationFrame(frame);
+  }
+  frame();
+}
+
+/* ── BUILD GRIDS ── */
+function buildGrid(items,gridId,dark){
+  const grid=document.getElementById(gridId);
+  items.forEach(item=>{
+    const card=document.createElement('div');card.className='cloth-card';
+    card.innerHTML=`
+      <div class="cloth-img">
+        <canvas width="300" height="400"></canvas>
+        ${item.badge?`<div class="cloth-badge ${dark?'badge-w':'badge-b'}">${item.badge}</div>`:''}
+        <div class="quick-add" onclick="addToCart('${item.name}','₦${item.price.toLocaleString()}')">+ Add to Cart</div>
+      </div>
+      <div class="cloth-info">
+        <span class="item-name">${item.name}</span>
+        <span class="item-price">₦${item.price.toLocaleString()}</span>
+      </div>`;
+    const canvas=card.querySelector('canvas');
+    drawGarment(canvas,item.type,dark);
+    grid.appendChild(card);
+  });
+}
+buildGrid(yinItems,'yin-grid',true);
+buildGrid(yangItems,'yang-grid',false);
+
+/* ── CART ── */
+let cart=[],cartOpen=false;
+function toggleCart(){
+  cartOpen=!cartOpen;
+  document.getElementById('cart-panel').classList.toggle('open',cartOpen);
+  document.getElementById('cart-overlay').classList.toggle('open',cartOpen);
+}
+function addToCart(name,price){
+  const ex=cart.find(i=>i.name===name);
+  if(ex)ex.qty++;else cart.push({name,price,qty:1});
+  updateCart();if(!cartOpen)toggleCart();
+}
+function removeFromCart(idx){cart.splice(idx,1);updateCart()}
+function parsePrice(p){return parseInt(p.replace(/[₦,]/g,''),10)}
+function updateCart(){
+  const n=cart.reduce((a,i)=>a+i.qty,0);
+  document.getElementById('cc').textContent=n;
+  document.getElementById('chc').textContent=n;
+  const el=document.getElementById('cart-items');
+  const ftr=document.getElementById('cart-ftr');
+  if(!cart.length){el.innerHTML='<p class="empty-c">Your cart is empty.</p>';ftr.style.display='none';return}
+  ftr.style.display='block';
+  const total=cart.reduce((a,i)=>a+parsePrice(i.price)*i.qty,0);
+  document.getElementById('cart-tot').textContent='₦'+total.toLocaleString();
+  el.innerHTML=cart.map((item,idx)=>`
+    <div class="c-item">
+      <div class="c-thumb"><canvas id="ct-${idx}" width="60" height="74"></canvas></div>
+      <div>
+        <p class="c-name">${item.name}</p>
+        <p class="c-price">${item.price} × ${item.qty}</p>
+        <button class="c-rm" onclick="removeFromCart(${idx})">Remove</button>
+      </div>
+    </div>`).join('');
+  cart.forEach((item,idx)=>{
+    const all=[...yinItems,...yangItems];
+    const prod=all.find(p=>p.name===item.name);
+    const cv=document.getElementById(`ct-${idx}`);
+    if(cv&&prod)drawGarment(cv,prod.type,yinItems.includes(prod),true);
+  });
+}
+
+/* ── INIT ── */
+initHero();
+initSym();
+</script>
+</body>
+</html>
